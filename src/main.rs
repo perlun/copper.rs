@@ -32,7 +32,7 @@ fn main() {
     }
     let ref app_root = args[1];
 
-    log4rs::init_file("config/log.toml", Default::default()).unwrap();
+    log4rs::init_file("config/log.yaml", Default::default()).unwrap();
 
     let mut server = Nickel::new();
     let mut router = Nickel::router();
