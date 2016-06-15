@@ -5,20 +5,6 @@ require 'sys/proctable'
 
 app_root = ENV['APP_ROOT'] or abort 'Error: You must point the APP_ROOT environment variable to your application root.'
 
-class GFilter
-  def self.run(files, &_block)
-    @mtimes ||= {}
-
-    files.each do |f|
-      mtime = File.mtime(f)
-      next if @mtimes[f] == mtime
-      @mtimes[f] = mtime
-
-      yield f
-    end
-  end
-end
-
 def kill_server_process
   Sys::ProcTable.ps.each do |ps|
     next unless ps.comm.casecmp('copper') == 0
@@ -26,12 +12,17 @@ def kill_server_process
   end
 end
 
+last_rebuild = Time.at(0)
+debounce = 2 # seconds
 guard :shell, all_on_start: true do
-  watch(%r{^src/}) do |m|
-    # Tends to get called multiple times on startup, hence this is needed.
-    GFilter.run(m) do
+  watch(%r{^src/}) do
+    since_last = Time.now - last_rebuild
+    if since_last > debounce
       kill_server_process
       system "cargo run #{app_root} &"
+      last_rebuild = Time.now
+    else
+      puts "Skipping rebuild after only #{since_last} seconds"
     end
   end
 end

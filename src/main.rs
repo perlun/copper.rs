@@ -7,23 +7,11 @@ extern crate log;
 extern crate log4rs;
 extern crate hyper;
 
-use nickel::*;
-use hyper::uri::RequestUri;
+use nickel::{HttpRouter, Nickel, StaticFilesHandler};
 use std::default::Default;
 use std::env;
 
-struct Logger;
-
-impl<D> Middleware<D> for Logger {
-    fn invoke<'mw, 'conn>(&self, req: &mut Request<'mw, 'conn, D>, res: Response<'mw, D>)
-    -> MiddlewareResult<'mw, D> {
-        if let RequestUri::AbsolutePath(ref path) = req.origin.uri {
-            info!("{0} {1}", req.origin.method, path);
-        }
-
-        res.next_middleware()
-    }
-}
+mod logging;
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -37,13 +25,13 @@ fn main() {
     let mut server = Nickel::new();
     let mut router = Nickel::router();
 
-    server.utilize(Logger);
     router.get("/api/sessions", middleware! {
         "foo"
     });
     server.utilize(router);
 
     server.utilize(StaticFilesHandler::new(app_root));
+    server.utilize(logging::Logger);
 
     let port = 6767;
     let host = format!("127.0.0.1:{}", port);
