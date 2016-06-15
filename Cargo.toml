@@ -11,9 +11,9 @@ keywords = ["nickel", "server", "web"]
 
 [dependencies]
 log = "*"
-log4rs = "*"
+log4rs = { version = "*", features = ["toml"] }
 nickel = "*"
 
 [dependencies.hyper]
-version = "=0.6"
+version = "=0.8"
 default-features = false
