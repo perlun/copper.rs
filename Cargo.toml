@@ -11,7 +11,7 @@ keywords = ["nickel", "server", "web"]
 
 [dependencies]
 log = "*"
-log4rs = { version = "*", features = ["toml"] }
+log4rs = { version = "*", features = ["yaml"] }
 nickel = "*"
 
 [dependencies.hyper]
