@@ -13,6 +13,7 @@ keywords = ["nickel", "server", "web"]
 log = "*"
 log4rs = { version = "*", features = ["yaml"] }
 nickel = "*"
+rustc-serialize = "*"
 
 [dependencies.hyper]
 version = "=0.8"
